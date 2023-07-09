@@ -74,3 +74,17 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 
 	return nil
 }
+
+// 構造体の中のヘッダーから、長さを取り出す
+func contentLength(req *HTTPRequest) (error, int) {
+	var result int
+
+	for _, r := range *req.header {
+		if r.name == "Content-Length" {
+			result, _ = strconv.Atoi(r.value)
+		}
+		break
+	}
+
+	return nil, result
+}

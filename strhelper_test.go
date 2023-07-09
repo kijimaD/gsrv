@@ -47,3 +47,15 @@ Content-Length: 100
 		}
 	}
 }
+
+func TestContentLength(t *testing.T) {
+	req := HTTPRequest{
+		header: &HTTPHeaderFields{{
+			name:  "Content-Length",
+			value: "100",
+		}},
+	}
+
+	_, actual := contentLength(&req)
+	assert.Equal(t, 100, actual)
+}
