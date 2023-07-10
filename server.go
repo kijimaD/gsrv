@@ -22,7 +22,7 @@ type HTTPRequest struct {
 	protoMinorVersion *int
 	method            *string
 	path              *string
-	header            *HTTPHeaderFields
+	header            HTTPHeaderFields
 	body              *string
 	length            int
 }

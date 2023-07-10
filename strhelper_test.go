@@ -37,11 +37,11 @@ Content-Type: text/plain
 Content-Length: 100
 `)
 	req := HTTPRequest{
-		header: &HTTPHeaderFields{},
+		header: HTTPHeaderFields{},
 	}
 	readHeaderField(r, &req)
 
-	for i, h := range *req.header {
+	for i, h := range req.header {
 		if i == 0 {
 			assert.Equal(t, "Connection", h.name)
 			assert.Equal(t, "Close", h.value)
@@ -59,7 +59,7 @@ Content-Length: 100
 
 func TestContentLength(t *testing.T) {
 	req := HTTPRequest{
-		header: &HTTPHeaderFields{{
+		header: HTTPHeaderFields{{
 			name:  "Content-Length",
 			value: "100",
 		}},

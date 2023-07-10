@@ -58,6 +58,7 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 	headerLineIdx := strings.Index(raw, "\n")
 	raw = raw[headerLineIdx+1:]
 
+	headers := out.header
 	for {
 		keyIdx := strings.Index(raw, ":")
 		key := raw[:keyIdx]
@@ -70,13 +71,14 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 			name:  key,
 			value: value,
 		}
-		*out.header = append(*out.header, h)
+		headers = append(headers, h)
 
 		raw = raw[valueIdx+1:]
 		if strings.Index(raw, "\n") == -1 {
 			break
 		}
 	}
+	out.header = headers
 
 	return nil
 }
@@ -85,7 +87,7 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 func contentLength(req *HTTPRequest) (error, int) {
 	var result int
 
-	for _, r := range *req.header {
+	for _, r := range req.header {
 		if r.name == "Content-Length" {
 			result, _ = strconv.Atoi(r.value)
 		}
