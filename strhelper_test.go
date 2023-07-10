@@ -1,6 +1,7 @@
 package gsrv
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -92,4 +93,42 @@ func TestContentLength(t *testing.T) {
 
 	contentLength(&req)
 	assert.Equal(t, 100, req.length)
+}
+
+func TestGetFileInfo(t *testing.T) {
+	result := getFileInfo(".", "README.md")
+	assert.Equal(t, true, result.ok)
+	result = getFileInfo(".", "NotExists")
+	assert.Equal(t, false, result.ok)
+}
+
+func TestFSpath(t *testing.T) {
+	actual := buildFSpath("dir/dir", "index.html")
+	assert.Equal(t, "dir/dir/index.html", actual)
+
+	tests := []struct {
+		docroot string
+		urlpath string
+		expect  string
+	}{
+		{
+			docroot: "dir/dir",
+			urlpath: "index.html",
+			expect:  "dir/dir/index.html",
+		},
+		{
+			docroot: ".",
+			urlpath: "index.html",
+			expect:  "index.html",
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+			got := buildFSpath(tt.docroot, tt.urlpath)
+			if got != tt.expect {
+				t.Errorf("got %s want %s", got, tt.expect)
+			}
+		})
+	}
 }

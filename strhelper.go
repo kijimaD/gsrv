@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"io"
+	"path"
 	"strconv"
 	"strings"
+	"syscall"
 )
 
 func readRequest(in io.Reader) HTTPRequest {
@@ -96,4 +98,25 @@ func contentLength(req *HTTPRequest) error {
 		}
 	}
 	return nil
+}
+
+func getFileInfo(docroot string, urlpath string) FileInfo {
+	info := FileInfo{}
+	st := syscall.Stat_t{}
+
+	info.path = buildFSpath(docroot, urlpath)
+	info.ok = false
+	if err := syscall.Lstat(info.path, &st); err != nil {
+		return info // 失敗
+	}
+	// TODO: ファイルじゃないなら失敗条件を入れる
+
+	info.ok = true
+	info.size = int(st.Size)
+	return info
+}
+
+func buildFSpath(docroot string, urlpath string) string {
+	path := path.Join(docroot, urlpath)
+	return path
 }
