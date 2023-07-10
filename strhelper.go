@@ -18,7 +18,7 @@ func readRequest(in io.Reader) HTTPRequest {
 
 	readRequestLine(abuf, &req)
 	readHeaderField(bbuf, &req)
-	_, req.length = contentLength(&req)
+	contentLength(&req)
 
 	return req
 }
@@ -84,14 +84,16 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 }
 
 // 構造体の中のヘッダーから、長さを取り出す
-func contentLength(req *HTTPRequest) (error, int) {
-	var result int
-
+func contentLength(req *HTTPRequest) error {
 	for _, r := range req.header {
 		if r.name == "Content-Length" {
-			result, _ = strconv.Atoi(r.value)
+			result, err := strconv.Atoi(r.value)
+			if err != nil {
+				return err
+			}
+			req.length = result
 			break
 		}
 	}
-	return nil, result
+	return nil
 }

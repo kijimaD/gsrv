@@ -90,6 +90,6 @@ func TestContentLength(t *testing.T) {
 			}},
 	}
 
-	_, actual := contentLength(&req)
-	assert.Equal(t, 100, actual)
+	contentLength(&req)
+	assert.Equal(t, 100, req.length)
 }
