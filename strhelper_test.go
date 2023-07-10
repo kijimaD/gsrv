@@ -13,7 +13,27 @@ Connection: Close
 Content-Type: text/plain
 Content-Length: 100
 `)
-	readRequest(r)
+	req := readRequest(r)
+	assert.Equal(t, "GET", *req.method)
+	assert.Equal(t, "/README.md", *req.path)
+	assert.Equal(t, 0, *req.protoMinorVersion)
+
+	for i, h := range req.header {
+		if i == 0 {
+			assert.Equal(t, "Connection", h.name)
+			assert.Equal(t, "Close", h.value)
+		}
+		if i == 1 {
+			assert.Equal(t, "Content-Type", h.name)
+			assert.Equal(t, "text/plain", h.value)
+		}
+		if i == 2 {
+			assert.Equal(t, "Content-Length", h.name)
+			assert.Equal(t, "100", h.value)
+		}
+	}
+
+	assert.Equal(t, 100, req.length)
 }
 
 func TestReadRequestLine(t *testing.T) {
@@ -59,10 +79,15 @@ Content-Length: 100
 
 func TestContentLength(t *testing.T) {
 	req := HTTPRequest{
-		header: HTTPHeaderFields{{
-			name:  "Content-Length",
-			value: "100",
-		}},
+		header: HTTPHeaderFields{
+			{
+				name:  "Connection",
+				value: "Close",
+			},
+			{
+				name:  "Content-Length",
+				value: "100",
+			}},
 	}
 
 	_, actual := contentLength(&req)
