@@ -1,6 +1,8 @@
 package gsrv
 
 import (
+	"bufio"
+	"bytes"
 	"io"
 	"strconv"
 	"strings"
@@ -8,17 +10,21 @@ import (
 
 func readRequest(in io.Reader) HTTPRequest {
 	req := HTTPRequest{}
-	readRequestLine(in, &req)
+
+	// io.Readerは再利用できない
+	// TODO: io.Copyを使うのをやめて1つのio.Readerでパースする
+	bbuf := new(bytes.Buffer)
+	abuf := io.TeeReader(in, bbuf)
+
+	readRequestLine(abuf, &req)
+	readHeaderField(bbuf, &req)
 	return req
 }
 
 func readRequestLine(in io.Reader, out *HTTPRequest) error {
-	buf := new(strings.Builder)
-	_, err := io.Copy(buf, in)
-	if err != nil {
-		return err
-	}
-	raw := buf.String()
+	scanner := bufio.NewScanner(in)
+	scanner.Scan()
+	raw := scanner.Text()
 
 	methodIdx := strings.Index(raw, " ")
 	method := raw[:methodIdx]
@@ -31,8 +37,7 @@ func readRequestLine(in io.Reader, out *HTTPRequest) error {
 
 	raw = raw[pathIdx+1:]
 	minorVersionIdx := strings.Index(raw, ".")
-	newLineIdx := strings.Index(raw, "\n")
-	minorVersion := raw[minorVersionIdx+1 : newLineIdx]
+	minorVersion := raw[minorVersionIdx+1:]
 	i, err := strconv.Atoi(minorVersion)
 	if err != nil {
 		return err
@@ -43,6 +48,7 @@ func readRequestLine(in io.Reader, out *HTTPRequest) error {
 }
 
 func readHeaderField(in io.Reader, out *HTTPRequest) error {
+	// TODO: copyを使うとio.Readerのカウンタがすべて走るので、scannerで1行ずつ処理するように書き直す
 	buf := new(strings.Builder)
 	_, err := io.Copy(buf, in)
 	if err != nil {

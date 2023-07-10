@@ -7,6 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestReadRequest(t *testing.T) {
+	r := strings.NewReader(`GET /README.md HTTP/1.0
+Connection: Close
+Content-Type: text/plain
+Content-Length: 100
+`)
+	readRequest(r)
+}
+
 func TestReadRequestLine(t *testing.T) {
 	r := strings.NewReader(`GET /README.md HTTP/1.0
 Connection: Close
