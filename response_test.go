@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRespondTo(t *testing.T) {
+func TestRespondToGet(t *testing.T) {
 	r := strings.NewReader(`GET /README.md HTTP/1.0
 Connection: Close
 Content-Type: text/plain
@@ -18,6 +18,39 @@ Content-Length: 100
 	out := bytes.Buffer{}
 
 	respondTo(req, &out, ".")
+	assert.Contains(t, out.String(), "HTTP/1.0 200 OK")
+	assert.Contains(t, out.String(), "Date: ")
+	assert.Contains(t, out.String(), "Server: gsrv/1.0.0")
+	assert.Contains(t, out.String(), "Connection: close")
+	assert.Contains(t, out.String(), "Content-Length: 7")
+	assert.Contains(t, out.String(), "Content-Type: text/plain")
+	assert.Contains(t, out.String(), "# gsrv")
+}
+
+func TestRespondToHEAD(t *testing.T) {
+	r := strings.NewReader(`HEAD /README.md HTTP/1.0
+Connection: Close
+Content-Type: text/plain
+Content-Length: 100
+`)
+	req := readRequest(r)
+	out := bytes.Buffer{}
+
+	respondTo(req, &out, ".")
+	assert.Contains(t, out.String(), "HTTP/1.0 200 OK")
+}
+
+func TestRespondToPOST(t *testing.T) {
+	r := strings.NewReader(`POST /README.md HTTP/1.0
+Connection: Close
+Content-Type: text/plain
+Content-Length: 100
+`)
+	req := readRequest(r)
+	out := bytes.Buffer{}
+
+	respondTo(req, &out, ".")
+	assert.Contains(t, out.String(), "<title>405 Method Not Allowed</title>")
 }
 
 func TestDoFileResponse(t *testing.T) {

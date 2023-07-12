@@ -3,14 +3,15 @@ package gsrv
 import (
 	"fmt"
 	"io"
+	"os"
 	"time"
 )
 
 func respondTo(req HTTPRequest, out io.Writer, docroot string) {
 	if req.method == "GET" {
-		doFileResponse(req, out, docroot)
+		_ = doFileResponse(req, out, docroot)
 	} else if req.method == "HEAD" {
-		doFileResponse(req, out, docroot)
+		_ = doFileResponse(req, out, docroot)
 	} else if req.method == "POST" {
 		methodNotAllowed(req, out)
 	} else {
@@ -18,9 +19,27 @@ func respondTo(req HTTPRequest, out io.Writer, docroot string) {
 	}
 }
 
-func doFileResponse(req HTTPRequest, out io.Writer, docroot string) {
+func doFileResponse(req HTTPRequest, out io.Writer, docroot string) error {
 	info := getFileInfo(docroot, req.path)
-	fmt.Println(info)
+	if !info.ok {
+		notFound(req, out)
+		return nil
+	}
+	outputCommonHeaderFields(req, out, "200 OK")
+	fmt.Fprintf(out, "Content-Length: %d\r\n", info.size)
+	fmt.Fprintf(out, "Content-Type: %s\r\n", guessContentType(info))
+	fmt.Fprintf(out, "\r\n")
+	if req.method == "GET" {
+		f, err := os.Open(info.path)
+		defer f.Close()
+		if err != nil {
+			return err
+		}
+		b := make([]byte, 1024)
+		n, err := f.Read(b)
+		out.Write(b[:n])
+	}
+	return nil
 }
 
 func methodNotAllowed(req HTTPRequest, out io.Writer) {
@@ -52,6 +71,18 @@ func notImplemented(req HTTPRequest, out io.Writer) {
 	fmt.Fprintf(out, "</html>\r\n")
 }
 
+func notFound(req HTTPRequest, out io.Writer) {
+	outputCommonHeaderFields(req, out, "404 Not Found")
+	fmt.Fprintf(out, "Content-Type: text/html\r\n")
+	fmt.Fprintf(out, "\r\n")
+	if req.method == "HEAD" {
+		fmt.Fprintf(out, "<html>\r\n")
+		fmt.Fprintf(out, "<header><title>Not Found</title><header>\r\n")
+		fmt.Fprintf(out, "<body><p>File not found</p></body>\r\n")
+		fmt.Fprintf(out, "</html>\r\n")
+	}
+}
+
 var (
 	HTTP_MINOR_VERSION = 0
 	SERVER_NAME        = "gsrv"
@@ -64,4 +95,8 @@ func outputCommonHeaderFields(req HTTPRequest, out io.Writer, status string) {
 	fmt.Fprintf(out, "Date: %s\r\n", n.Format(time.RFC1123))
 	fmt.Fprintf(out, "Server: %s/%s\r\n", SERVER_NAME, SERVER_VERSION)
 	fmt.Fprintf(out, "Connection: close\r\n")
+}
+
+func guessContentType(info FileInfo) string {
+	return "text/plain"
 }
