@@ -15,9 +15,9 @@ Content-Type: text/plain
 Content-Length: 100
 `)
 	req := readRequest(r)
-	assert.Equal(t, "GET", *req.method)
-	assert.Equal(t, "/README.md", *req.path)
-	assert.Equal(t, 0, *req.protoMinorVersion)
+	assert.Equal(t, "GET", req.method)
+	assert.Equal(t, "/README.md", req.path)
+	assert.Equal(t, 0, req.protoMinorVersion)
 
 	for i, h := range req.header {
 		if i == 0 {
@@ -46,9 +46,9 @@ Content-Length: 100
 
 	req := HTTPRequest{}
 	readRequestLine(r, &req)
-	assert.Equal(t, "GET", *req.method)
-	assert.Equal(t, "/README.md", *req.path)
-	assert.Equal(t, 0, *req.protoMinorVersion)
+	assert.Equal(t, "GET", req.method)
+	assert.Equal(t, "/README.md", req.path)
+	assert.Equal(t, 0, req.protoMinorVersion)
 }
 
 func TestReadHeaderField(t *testing.T) {

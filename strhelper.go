@@ -32,12 +32,12 @@ func readRequestLine(in io.Reader, out *HTTPRequest) error {
 
 	methodIdx := strings.Index(raw, " ")
 	method := raw[:methodIdx]
-	out.method = &method
+	out.method = method
 
 	raw = raw[methodIdx+1:]
 	pathIdx := strings.Index(raw, " ")
 	path := raw[:pathIdx]
-	out.path = &path
+	out.path = path
 
 	raw = raw[pathIdx+1:]
 	minorVersionIdx := strings.Index(raw, ".")
@@ -46,7 +46,7 @@ func readRequestLine(in io.Reader, out *HTTPRequest) error {
 	if err != nil {
 		return err
 	}
-	out.protoMinorVersion = &i
+	out.protoMinorVersion = i
 
 	return nil
 }

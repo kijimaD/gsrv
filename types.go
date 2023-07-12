@@ -8,11 +8,11 @@ type HTTPHeaderField struct {
 }
 
 type HTTPRequest struct {
-	protoMinorVersion *int
-	method            *string
-	path              *string
+	protoMinorVersion int
+	method            string
+	path              string
 	header            HTTPHeaderFields
-	body              *string
+	body              string
 	length            int
 }
 
