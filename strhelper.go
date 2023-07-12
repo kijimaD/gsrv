@@ -63,6 +63,10 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 	raw = raw[headerLineIdx+1:]
 
 	for {
+		if strings.Index(raw, "\n") == -1 {
+			break
+		}
+
 		keyIdx := strings.Index(raw, ":")
 		key := raw[:keyIdx]
 
@@ -75,11 +79,7 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 			value: value,
 		}
 		out.header = append(out.header, h)
-
 		raw = raw[valueIdx+1:]
-		if strings.Index(raw, "\n") == -1 {
-			break
-		}
 	}
 
 	return nil

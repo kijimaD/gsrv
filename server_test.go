@@ -15,7 +15,7 @@ Content-Type: text/plain
 Content-Length: 100
 `)
 	buf := bytes.Buffer{}
-	service(r, &buf, ".")
+	Service(r, &buf, ".")
 	assert.Contains(t, buf.String(), "HTTP/1.0 200 OK")
 	assert.Contains(t, buf.String(), "# gsrv")
 }

@@ -27,6 +27,25 @@ Content-Length: 100
 	assert.Contains(t, out.String(), "# gsrv")
 }
 
+func TestRespondToNotFound(t *testing.T) {
+	r := strings.NewReader(`GET /this_is_not_exist HTTP/1.0
+Connection: Close
+Content-Type: text/plain
+Content-Length: 100
+`)
+	req := readRequest(r)
+	out := bytes.Buffer{}
+
+	respondTo(req, &out, ".")
+	assert.Contains(t, out.String(), "HTTP/1.0 404 Not Found")
+	assert.Contains(t, out.String(), "Date: ")
+	assert.Contains(t, out.String(), "Server: gsrv/1.0.0")
+	assert.Contains(t, out.String(), "Connection: close")
+	assert.NotContains(t, out.String(), "Content-Length: 7")
+	assert.NotContains(t, out.String(), "Content-Type: text/plain")
+	assert.NotContains(t, out.String(), "# gsrv")
+}
+
 func TestRespondToHEAD(t *testing.T) {
 	r := strings.NewReader(`HEAD /README.md HTTP/1.0
 Connection: Close

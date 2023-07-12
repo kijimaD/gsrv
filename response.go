@@ -25,10 +25,6 @@ func doFileResponse(req HTTPRequest, out io.Writer, docroot string) error {
 		notFound(req, out)
 		return nil
 	}
-	outputCommonHeaderFields(req, out, "200 OK")
-	fmt.Fprintf(out, "Content-Length: %d\r\n", info.size)
-	fmt.Fprintf(out, "Content-Type: %s\r\n", guessContentType(info))
-	fmt.Fprintf(out, "\r\n")
 	if req.method == "GET" {
 		f, err := os.Open(info.path)
 		defer f.Close()
@@ -37,7 +33,20 @@ func doFileResponse(req HTTPRequest, out io.Writer, docroot string) error {
 		}
 		b := make([]byte, 1024)
 		n, err := f.Read(b)
-		out.Write(b[:n])
+		if os.IsNotExist(err) {
+			notFound(req, out)
+		} else {
+			outputCommonHeaderFields(req, out, "200 OK")
+			fmt.Fprintf(out, "Content-Length: %d\r\n", info.size)
+			fmt.Fprintf(out, "Content-Type: %s\r\n", guessContentType(info))
+			fmt.Fprintf(out, "\r\n")
+			out.Write(b[:n])
+		}
+	} else if req.method == "HEAD" {
+		outputCommonHeaderFields(req, out, "200 OK")
+		fmt.Fprintf(out, "Content-Length: %d\r\n", info.size)
+		fmt.Fprintf(out, "Content-Type: %s\r\n", guessContentType(info))
+		fmt.Fprintf(out, "\r\n")
 	}
 	return nil
 }
