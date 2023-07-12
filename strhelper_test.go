@@ -9,14 +9,14 @@ import (
 )
 
 func TestReadRequest(t *testing.T) {
-	r := strings.NewReader(`GET /README.md HTTP/1.0
+	r := strings.NewReader(`GET /dummy.txt HTTP/1.0
 Connection: Close
 Content-Type: text/plain
 Content-Length: 100
 `)
 	req := readRequest(r)
 	assert.Equal(t, "GET", req.method)
-	assert.Equal(t, "/README.md", req.path)
+	assert.Equal(t, "/dummy.txt", req.path)
 	assert.Equal(t, 0, req.protoMinorVersion)
 
 	for i, h := range req.header {
@@ -38,7 +38,7 @@ Content-Length: 100
 }
 
 func TestReadRequestLine(t *testing.T) {
-	r := strings.NewReader(`GET /README.md HTTP/1.0
+	r := strings.NewReader(`GET /dummy.txt HTTP/1.0
 Connection: Close
 Content-Type: text/plain
 Content-Length: 100
@@ -47,12 +47,12 @@ Content-Length: 100
 	req := HTTPRequest{}
 	readRequestLine(r, &req)
 	assert.Equal(t, "GET", req.method)
-	assert.Equal(t, "/README.md", req.path)
+	assert.Equal(t, "/dummy.txt", req.path)
 	assert.Equal(t, 0, req.protoMinorVersion)
 }
 
 func TestReadHeaderField(t *testing.T) {
-	r := strings.NewReader(`GET /README.md HTTP/1.0
+	r := strings.NewReader(`GET /dummy.txt HTTP/1.0
 Connection: Close
 Content-Type: text/plain
 Content-Length: 100
@@ -96,7 +96,7 @@ func TestContentLength(t *testing.T) {
 }
 
 func TestGetFileInfo(t *testing.T) {
-	result := getFileInfo(".", "README.md")
+	result := getFileInfo(".", "dummy.txt")
 	assert.Equal(t, true, result.ok)
 	result = getFileInfo(".", "NotExists")
 	assert.Equal(t, false, result.ok)

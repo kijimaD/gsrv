@@ -14,9 +14,11 @@ func main() {
 	}
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
+		os.Stdout.Write([]byte("> "))
 		scanner.Scan()
 		in := scanner.Text()
 		r := strings.NewReader(in)
+		os.Stdout.Write([]byte("\n"))
 		gsrv.Service(r, os.Stdout, os.Args[1])
 	}
 }

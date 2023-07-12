@@ -8,14 +8,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestService(t *testing.T) {
-	r := strings.NewReader(`GET /README.md HTTP/1.0
-Connection: Close
-Content-Type: text/plain
-Content-Length: 100
-`)
+func TestServiceOK(t *testing.T) {
+	r := strings.NewReader(`GET /dummy.txt HTTP/1.0`)
 	buf := bytes.Buffer{}
 	Service(r, &buf, ".")
 	assert.Contains(t, buf.String(), "HTTP/1.0 200 OK")
-	assert.Contains(t, buf.String(), "# gsrv")
+	assert.Contains(t, buf.String(), "this is dummy text")
+}
+
+func TestServiceNotFound(t *testing.T) {
+	r := strings.NewReader(`GET /this_is_not_exists HTTP/1.0`)
+	buf := bytes.Buffer{}
+	Service(r, &buf, ".")
+	assert.Contains(t, buf.String(), "HTTP/1.0 404 Not Found")
 }

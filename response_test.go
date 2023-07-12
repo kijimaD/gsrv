@@ -9,11 +9,7 @@ import (
 )
 
 func TestRespondToGet(t *testing.T) {
-	r := strings.NewReader(`GET /README.md HTTP/1.0
-Connection: Close
-Content-Type: text/plain
-Content-Length: 100
-`)
+	r := strings.NewReader(`GET /dummy.txt HTTP/1.0`)
 	req := readRequest(r)
 	out := bytes.Buffer{}
 
@@ -22,17 +18,13 @@ Content-Length: 100
 	assert.Contains(t, out.String(), "Date: ")
 	assert.Contains(t, out.String(), "Server: gsrv/1.0.0")
 	assert.Contains(t, out.String(), "Connection: close")
-	assert.Contains(t, out.String(), "Content-Length: 7")
+	assert.Contains(t, out.String(), "Content-Length: 19")
 	assert.Contains(t, out.String(), "Content-Type: text/plain")
-	assert.Contains(t, out.String(), "# gsrv")
+	assert.Contains(t, out.String(), "this is dummy text")
 }
 
 func TestRespondToNotFound(t *testing.T) {
-	r := strings.NewReader(`GET /this_is_not_exist HTTP/1.0
-Connection: Close
-Content-Type: text/plain
-Content-Length: 100
-`)
+	r := strings.NewReader(`GET /this_is_not_exist HTTP/1.0`)
 	req := readRequest(r)
 	out := bytes.Buffer{}
 
@@ -47,11 +39,7 @@ Content-Length: 100
 }
 
 func TestRespondToHEAD(t *testing.T) {
-	r := strings.NewReader(`HEAD /README.md HTTP/1.0
-Connection: Close
-Content-Type: text/plain
-Content-Length: 100
-`)
+	r := strings.NewReader(`HEAD /dummy.txt HTTP/1.0`)
 	req := readRequest(r)
 	out := bytes.Buffer{}
 
@@ -60,11 +48,7 @@ Content-Length: 100
 }
 
 func TestRespondToPOST(t *testing.T) {
-	r := strings.NewReader(`POST /README.md HTTP/1.0
-Connection: Close
-Content-Type: text/plain
-Content-Length: 100
-`)
+	r := strings.NewReader(`POST /dummy.txt HTTP/1.0`)
 	req := readRequest(r)
 	out := bytes.Buffer{}
 
