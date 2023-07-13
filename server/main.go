@@ -1,20 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"log"
 	"net"
-	"strings"
 	"time"
 
 	"github.com/kijimaD/gsrv"
 )
-
-func echoHandler(conn *net.TCPConn) {
-	defer conn.Close()
-	r := strings.NewReader("GET /dummy.txt HTTP/1.0")
-	gsrv.Service(r, conn, ".")
-	time.Sleep(time.Second)
-}
 
 var TimeoutSec = time.Second * 10
 
@@ -38,6 +31,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go echoHandler(conn)
+		go handler(conn)
 	}
+}
+
+func handler(conn *net.TCPConn) {
+	defer conn.Close()
+	r := bufio.NewReader(conn)
+	gsrv.Service(r, conn, ".")
+	time.Sleep(time.Second)
 }
