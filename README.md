@@ -1,5 +1,18 @@
 # gsrv
 
+## Server
+
+```
+go run server/main.go .
+```
+
+And enjoy making requests in your browser!
+
+- http://localhost:7777/dummy.txt
+- http://localhost:7777/not_exist_file
+
+## REPL
+
 ```
 $ go run cmd/main.go .
 > GET /dummy.txt HTTP/1.0

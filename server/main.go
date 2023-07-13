@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"net"
+	"os"
 	"time"
 
 	"github.com/kijimaD/gsrv"
@@ -12,6 +13,10 @@ import (
 var TimeoutSec = time.Second * 10
 
 func main() {
+	if len(os.Args) != 2 {
+		panic("Usage: [docroot]\n")
+	}
+
 	tcpAddr, err := net.ResolveTCPAddr("tcp", ":7777")
 	if err != nil {
 		log.Fatal(err)
@@ -31,13 +36,13 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handler(conn)
+		go handler(conn, os.Args[1])
 	}
 }
 
-func handler(conn *net.TCPConn) {
+func handler(conn *net.TCPConn, docroot string) {
 	defer conn.Close()
 	r := bufio.NewReader(conn)
-	gsrv.Service(r, conn, ".")
+	gsrv.Service(r, conn, docroot)
 	time.Sleep(time.Second)
 }
