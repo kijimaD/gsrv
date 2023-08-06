@@ -22,5 +22,8 @@ FROM gcr.io/distroless/static-debian11:latest AS release
 
 COPY --from=builder /build/bin/gsrv /bin/
 WORKDIR /workdir
+
+# sample
 COPY dummy.txt dummy.txt
+
 CMD ["/bin/gsrv", "."]
