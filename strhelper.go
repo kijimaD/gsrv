@@ -66,8 +66,10 @@ func readHeaderField(in io.Reader, out *HTTPRequest) error {
 		if strings.Index(raw, "\n") == -1 {
 			break
 		}
-
 		keyIdx := strings.Index(raw, ": ")
+		if keyIdx == -1 {
+			break
+		}
 		key := raw[:keyIdx]
 
 		raw = raw[keyIdx+2:]                 // ": "の分

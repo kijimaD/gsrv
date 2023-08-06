@@ -28,10 +28,6 @@ func main() {
 	}
 
 	for {
-		err := ln.SetDeadline(time.Now().Add(TimeoutSec))
-		if err != nil {
-			log.Fatal(err)
-		}
 		conn, err := ln.AcceptTCP()
 		if err != nil {
 			log.Fatal(err)
@@ -44,5 +40,5 @@ func handler(conn *net.TCPConn, docroot string) {
 	defer conn.Close()
 	r := bufio.NewReader(conn)
 	gsrv.Service(r, conn, docroot)
-	time.Sleep(time.Second)
+	time.Sleep(100 * time.Millisecond)
 }
